@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  egg-learning-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: egg-learning-app
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    networks:
+      - egg-learning-network
+
+networks:
+  egg-learning-network:
+    driver: bridge
