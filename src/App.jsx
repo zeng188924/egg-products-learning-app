@@ -39,8 +39,13 @@ function App() {
 
   // 加载产品数据
   useEffect(() => {
-    fetch('/products-data.json')
-      .then(response => response.json())
+    // 用 BASE_URL 拼接路径，兼容本地和 GitHub Pages 子路径部署
+    const dataUrl = (import.meta.env.BASE_URL || '/') + 'products-data.json'
+    fetch(dataUrl)
+      .then(response => {
+        if (!response.ok) throw new Error('HTTP ' + response.status)
+        return response.json()
+      })
       .then(data => {
         setLoadedProducts(data.products || [])
         if (data.products && data.products.length > 0) {
@@ -52,10 +57,14 @@ function App() {
         // 如果加载失败，使用本地默认数据
         const saved = localStorage.getItem('customProducts')
         if (saved) {
-          const customData = JSON.parse(saved)
-          setLoadedProducts(customData)
-          if (customData.length > 0) {
-            setSelectedProduct(customData[0])
+          try {
+            const customData = JSON.parse(saved)
+            setLoadedProducts(customData)
+            if (customData.length > 0) {
+              setSelectedProduct(customData[0])
+            }
+          } catch (e) {
+            console.error('解析本地数据失败:', e)
           }
         }
       })
