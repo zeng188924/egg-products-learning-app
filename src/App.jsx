@@ -1,6 +1,14 @@
 import { useState, useEffect, useRef } from 'react'
 import './App.css'
 
+// 安全获取颜色值
+const safeColor = (color, fallback = '#4CAF50') => {
+  if (typeof color === 'string' && /^#[0-9A-Fa-f]{3,8}$/.test(color)) {
+    return color
+  }
+  return fallback
+}
+
 // 学习模式枚举
 const LearningMode = {
   OVERVIEW: 'overview',      // 总览模式
@@ -267,7 +275,11 @@ function App() {
   }
 
   // 渲染总览模式
-  const renderOverview = () => (
+  const renderOverview = () => {
+    if (!selectedProduct) {
+      return <div className="overview"><p>正在加载产品数据...</p></div>
+    }
+    return (
     <div className="overview">
       <div className="product-grid">
         {loadedProducts.map(product => (
@@ -275,7 +287,7 @@ function App() {
             key={product.id}
             className={`product-card ${selectedProduct && selectedProduct.id === product.id ? 'active' : ''}`}
             onClick={() => setSelectedProduct(product)}
-            style={{ borderLeftColor: product.color }}
+            style={{ borderLeftColor: safeColor(product.color) }}
           >
             <div className="product-icon">{product.icon}</div>
             <div className="product-info">
@@ -289,7 +301,7 @@ function App() {
                       width: `${(product.sections.filter((s, i) =>
                         learnedCards.includes(`${product.id}-${i}`)
                       ).length / product.sections.length) * 100}%`,
-                      backgroundColor: product.color
+                      backgroundColor: safeColor(product.color)
                     }}
                   />
                 </div>
@@ -343,10 +355,14 @@ function App() {
         </button>
       </div>
     </div>
-  )
+    )
+  }
 
   // 渲染闪卡模式
   const renderCard = () => {
+    if (!selectedProduct) {
+      return <div className="card-mode"><p>正在加载产品数据...</p></div>
+    }
     const currentSection = selectedProduct.sections[currentCardIndex]
 
     return (
@@ -406,7 +422,11 @@ function App() {
   }
 
   // 渲染语音学习模式
-  const renderListen = () => (
+  const renderListen = () => {
+    if (!selectedProduct) {
+      return <div className="listen-mode"><p>正在加载产品数据...</p></div>
+    }
+    return (
     <div className="listen-mode">
       <div className="listen-header">
         <h2>🔊 语音学习模式</h2>
@@ -495,7 +515,8 @@ function App() {
         )}
       </div>
     </div>
-  )
+    )
+  }
 
   // 渲染测验模式
   const renderQuiz = () => {
@@ -578,7 +599,7 @@ function App() {
                   cy="50"
                   r="45"
                   fill="none"
-                  stroke="var(--primary-color)"
+                  stroke="#4CAF50"
                   strokeWidth="10"
                   strokeDasharray={`${progressPercent * 2.83} 283`}
                   transform="rotate(-90 50 50)"
@@ -630,7 +651,7 @@ function App() {
                     className="product-progress-fill"
                     style={{
                       width: `${total > 0 ? (learned / total) * 100 : 0}%`,
-                      backgroundColor: product.color
+                      backgroundColor: safeColor(product.color)
                     }}
                   />
                 </div>
@@ -865,7 +886,7 @@ function App() {
       {/* 产品列表 */}
       <div className="products-list">
         {editingProducts.map(product => (
-          <div key={product.id} className="product-edit-card" style={{ borderLeftColor: product.color }}>
+          <div key={product.id} className="product-edit-card" style={{ borderLeftColor: safeColor(product.color) }}>
             <div className="product-edit-header">
               <div className="product-edit-info">
                 <span className="product-icon">{product.icon}</span>
