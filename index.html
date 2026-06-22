@@ -25,6 +25,23 @@
     <link rel="stylesheet" crossorigin href="./assets/index-RGKUaf1_.css">
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"></div>
+    <script>
+      // 一次性清理旧的 Service Worker（v2.4 之后不再注册 SW）
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(regs) {
+          for (var i = 0; i < regs.length; i++) {
+            regs[i].unregister();
+          }
+        });
+        if (window.caches && caches.keys) {
+          caches.keys().then(function(keys) {
+            for (var i = 0; i < keys.length; i++) {
+              caches.delete(keys[i]);
+            }
+          });
+        }
+      }
+    </script>
   </body>
 </html>
