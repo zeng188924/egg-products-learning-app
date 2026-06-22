@@ -833,6 +833,48 @@
   background: var(--accent-color);
 }
 
+.version-footer {
+  position: fixed;
+  bottom: 80px;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  z-index: 99;
+  pointer-events: none;
+}
+
+.version-footer > span {
+  font-size: 11px;
+  color: rgba(0, 0, 0, 0.4);
+  background: rgba(255, 255, 255, 0.7);
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-family: monospace;
+}
+
+.update-btn {
+  pointer-events: auto;
+  background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(238, 90, 111, 0.4);
+  animation: bounce 1s ease infinite;
+  font-weight: 500;
+}
+
+.update-btn:active { transform: scale(0.95); }
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
 /* 响应式设计 */
 @media (max-width: 480px) {
   .product-grid {

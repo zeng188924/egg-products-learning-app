@@ -33,6 +33,8 @@ function App() {
   const [speechSynthesis, setSpeechSynthesis] = useState(null)
   const [browserSupport, setBrowserSupport] = useState({ speech: true, isWeChat: false })
   const [showBrowserTip, setShowBrowserTip] = useState(false)
+  const [swUpdateAvailable, setSwUpdateAvailable] = useState(false)
+  const [swRegistration, setSwRegistration] = useState(null)
   const speechRef = useRef(null)
 
   // 加载产品数据
@@ -261,6 +263,40 @@ function App() {
       setQuizzes(generateQuiz(loadedProducts))
     }
   }, [loadedProducts])
+
+  // 监听 Service Worker 更新
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistration().then(reg => {
+        if (!reg) return
+        setSwRegistration(reg)
+        if (reg.waiting) setSwUpdateAvailable(true)
+        reg.addEventListener('updatefound', () => {
+          const newWorker = reg.installing
+          if (!newWorker) return
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              setSwUpdateAvailable(true)
+            }
+          })
+        })
+      })
+      navigator.serviceWorker.getRegistration().then(reg => {
+        if (reg) reg.update().catch(() => {})
+      })
+    }
+  }, [])
+
+  const applyUpdate = () => {
+    if (swRegistration && swRegistration.waiting) {
+      swRegistration.waiting.postMessage({ type: 'SKIP_WAITING' })
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        window.location.reload()
+      })
+    } else {
+      window.location.reload()
+    }
+  }
 
   const handleQuizAnswer = (selectedAnswer) => {
     setQuizAnswer(selectedAnswer)
@@ -1079,6 +1115,15 @@ function App() {
           </button>
         </div>
       )}
+
+      <div className="version-footer">
+        <span>v2.0 · 2026-06-22 · 修复 null 报错</span>
+        {swUpdateAvailable && (
+          <button className="update-btn" onClick={applyUpdate}>
+            🔄 新版本可用，点击更新
+          </button>
+        )}
+      </div>
     </div>
   )
 }
